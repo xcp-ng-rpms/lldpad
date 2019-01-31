@@ -1,0 +1,66 @@
+diff -Naur lldpad-0.9.46.orig/include/lldp_util.h lldpad-0.9.46/include/lldp_util.h
+--- lldpad-0.9.46.orig/include/lldp_util.h	2016-01-12 11:46:53.263656395 +0000
++++ lldpad-0.9.46/include/lldp_util.h	2016-01-18 16:12:25.337701739 +0000
+@@ -129,6 +129,7 @@
+ int is_vlan_capable(const char *ifname);
+ int is_wlan(const char *ifname);
+ int is_macvtap(const char *ifname);
++int is_not_pif(const char *ifname);
+ int is_valid_mac(const u8 *mac);
+ int is_san_mac(u8 *addr);
+ int is_ether(const char *ifname);
+diff -Naur lldpad-0.9.46.orig/lldp_util.c lldpad-0.9.46/lldp_util.c
+--- lldpad-0.9.46.orig/lldp_util.c	2016-01-12 11:46:53.239656396 +0000
++++ lldpad-0.9.46/lldp_util.c	2016-01-18 16:12:02.169702344 +0000
+@@ -160,6 +160,8 @@
+ 		return 0;
+ 	if (is_macvtap(device_name))
+ 		return 0;
++	if (is_not_pif(device_name))
++		return 0;
+ 	return 1;
+ }
+ 
+@@ -711,6 +713,42 @@
+ 	return false;
+ }
+ 
++int is_not_pif(const char *ifname)
++{
++	int fd, rc = 0;
++	unsigned int i;
++	struct ifreq ifr;
++	struct ethtool_drvinfo drvinfo;
++
++	const char *nonethernet_drivers[] = {
++		"bonding",
++		"bridge",
++		"openvswitch",
++		"netbk",
++		"netfront",
++		"tun",
++		"vif",
++	};
++
++	memset(&ifr, 0, sizeof(ifr));
++	memset(&drvinfo, 0, sizeof(drvinfo));
++	strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name)-1);
++
++	fd = get_ioctl_socket();
++	if (fd >= 0) {
++		drvinfo.cmd = ETHTOOL_GDRVINFO;
++		ifr.ifr_data = (caddr_t)&drvinfo;
++		if (ioctl(fd, SIOCETHTOOL, &ifr) == 0) {
++			for (i=0; i<sizeof(nonethernet_drivers)/sizeof(nonethernet_drivers[0]); i++) {
++				if (strncmp(drvinfo.driver, nonethernet_drivers[i], sizeof(drvinfo.driver)) == 0)
++					rc = 1;
++			}
++		}
++	}
++
++	return rc;
++}
++
+ static int is_router(void)
+ {
+ 	int rc = 0;
