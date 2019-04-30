@@ -5,7 +5,7 @@
 
 Name:               lldpad
 Version:            1.0.1
-Release:            3.git%{checkout}%{?dist}.xs1
+Release:            3.git%{checkout}%{?dist}
 Summary:            Intel LLDP Agent
 Group:              System Environment/Daemons
 License:            GPLv2
