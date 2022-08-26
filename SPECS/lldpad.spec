@@ -1,52 +1,49 @@
+%global package_speccommit 3d91cafde299feddffa167f1ac10e64a49bbadf4
+%global usver 1.0.1
+%global xsver 6
+%global xsrel %{xsver}%{?xscount}%{?xshash}
+%global package_srccommit refs/tags/v1.0.1
+
 # https://fedoraproject.org/wiki/Packaging:Guidelines#Compiler_flags
 %define _hardened_build 1
 
-%global checkout 036e314
-
 Name:               lldpad
 Version:            1.0.1
-Release:            3.git%{checkout}%{?dist}
+Release:            %{?xsrel}%{?dist}
 Summary:            Intel LLDP Agent
 Group:              System Environment/Daemons
 License:            GPLv2
 URL:                http://open-lldp.org/
-
-Source0: https://repo.citrite.net/xs-local-contrib/lldpad/lldpad-1.0.1.tar.gz
-Patch1: SOURCES/lldpad/open-lldp-v1.0.1-1-VDP-vdp22_cmds-retrieve-vsi-paramenter-data.patch
-Patch2: SOURCES/lldpad/open-lldp-v1.0.1-2-VDP-vdptool-first-version.patch
-Patch3: SOURCES/lldpad/open-lldp-v1.0.1-3-VDP-vdptool-test-cases-Some-test-cases-to-test-the-n.patch
-Patch4: SOURCES/lldpad/open-lldp-v1.0.1-4-VDP-Changes-to-make-the-interface-to-VDP22-in-lldpad.patch
-Patch5: SOURCES/lldpad/open-lldp-v1.0.1-5-VDP-Support-for-get-tlv-in-vdptool-and-VDP22.patch
-Patch6: SOURCES/lldpad/open-lldp-v1.0.1-6-VDP-Support-in-VDP22-for-correct-error-code-status-t.patch
-Patch7: SOURCES/lldpad/open-lldp-v1.0.1-7-VDP-Support-for-OUI-infrastructure-in-VDP22.patch
-Patch8: SOURCES/lldpad/open-lldp-v1.0.1-8-VDP-Support-for-OUI-infrastructure-in-vdptool.patch
-Patch9: SOURCES/lldpad/open-lldp-v1.0.1-9-VDP-Support-for-OUI-infrastructure-in-vdp22.patch
-Patch10: SOURCES/lldpad/open-lldp-v1.0.1-10-VDP-Support-for-OUI-infrastructure-in-vdp22.patch
-Patch11: SOURCES/lldpad/open-lldp-v1.0.1-11-VDP-Support-for-Cisco-specific-OUI-extensions-to-VDP.patch
-Patch12: SOURCES/lldpad/open-lldp-v1.0.1-12-VDP22-Fix-the-ack-timeout-handler-to-set-the-right-t.patch
-Patch13: SOURCES/lldpad/open-lldp-v1.0.1-13-VDP-Changes-in-OUI-infra-for-get-tlv.patch
-Patch14: SOURCES/lldpad/open-lldp-v1.0.1-14-VDP-Changes-in-Cisco-OUI-handlers-to-support-get-tlv.patch
-Patch15: SOURCES/lldpad/open-lldp-v1.0.1-15-VDP-Add-vdptool-man-page-to-Makefile.patch
-Patch16: SOURCES/lldpad/open-lldp-v1.0.1-16-VDP-Fixed-DBG-print-compile-errors-in-32-bit-systems.patch
-Patch17: SOURCES/lldpad/open-lldp-v1.0.1-17-lldp-automake-fixes-for-dist-distcheck.patch
-Patch18: SOURCES/lldpad/open-lldp-v1.0.1-18-enabled-test-tool-building-for-distcheck.patch
-Patch19: SOURCES/lldpad/open-lldp-v1.0.1-19-nltest-build-error.patch
-Patch20: SOURCES/lldpad/open-lldp-v1.0.1-20-lldp-automake-fix-drop-prefix-on-vdptool_LDADD.patch
-Patch21: SOURCES/lldpad/open-lldp-v1.0.1-21-lldpad-Fix-DCBX-event-generation-from-lldpad.patch
-Patch22: SOURCES/lldpad/open-lldp-v1.0.1-22-vdp-Fixed-the-memory-leak-for-modify-VSI-support-for.patch
-Patch23: SOURCES/lldpad/open-lldp-v1.0.1-23-lldp-make-TTL-TLV-configurable.patch
-Patch24: SOURCES/lldpad/open-lldp-v1.0.1-24-switch-from-sysv-to-posix-shared-memory-apis.patch
-Patch25: SOURCES/lldpad/open-lldp-v1.0.1-25-l2_linux_packet-correctly-process-return-value-of-ge.patch
-Patch26: SOURCES/lldpad/open-lldp-v1.0.1-26-lldpad-system-capability-incorrect-advertised-as-sta.patch
-Patch27: SOURCES/lldpad/open-lldp-v1.0.1-27-fix-build-warnings.patch
-Patch99: SOURCES/lldpad/lldpad-0.9.46-Ignore-supplied-PG-configuration-if-PG-is-being-disabled.patch
-
-Patch100: dont-add-xs-vif-to-lldpad.patch
-
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XS/repos/lldpad.pg/archive?at=v1.0.0&format=tar#/lldpad-v1.0.0.pg.tar) = 08bf87c1437327b8a59eb09234a15469c338ad6c
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/lldpad.centos/archive?at=imports%2Fc7%2Flldpad-1.0.1-3.git036e314.el7&format=tar.gz#/lldpad-1.0.1.centos.tar.gz) = e72aea49f2b7e8092ba55c2495cdc03f7e9b9ece
-
-# not upstream
+Source0: lldpad-1.0.1.tar.gz
+Patch0: open-lldp-v1.0.1-1-VDP-vdp22_cmds-retrieve-vsi-paramenter-data.patch
+Patch1: open-lldp-v1.0.1-2-VDP-vdptool-first-version.patch
+Patch2: open-lldp-v1.0.1-3-VDP-vdptool-test-cases-Some-test-cases-to-test-the-n.patch
+Patch3: open-lldp-v1.0.1-4-VDP-Changes-to-make-the-interface-to-VDP22-in-lldpad.patch
+Patch4: open-lldp-v1.0.1-5-VDP-Support-for-get-tlv-in-vdptool-and-VDP22.patch
+Patch5: open-lldp-v1.0.1-6-VDP-Support-in-VDP22-for-correct-error-code-status-t.patch
+Patch6: open-lldp-v1.0.1-7-VDP-Support-for-OUI-infrastructure-in-VDP22.patch
+Patch7: open-lldp-v1.0.1-8-VDP-Support-for-OUI-infrastructure-in-vdptool.patch
+Patch8: open-lldp-v1.0.1-9-VDP-Support-for-OUI-infrastructure-in-vdp22.patch
+Patch9: open-lldp-v1.0.1-10-VDP-Support-for-OUI-infrastructure-in-vdp22.patch
+Patch10: open-lldp-v1.0.1-11-VDP-Support-for-Cisco-specific-OUI-extensions-to-VDP.patch
+Patch11: open-lldp-v1.0.1-12-VDP22-Fix-the-ack-timeout-handler-to-set-the-right-t.patch
+Patch12: open-lldp-v1.0.1-13-VDP-Changes-in-OUI-infra-for-get-tlv.patch
+Patch13: open-lldp-v1.0.1-14-VDP-Changes-in-Cisco-OUI-handlers-to-support-get-tlv.patch
+Patch14: open-lldp-v1.0.1-15-VDP-Add-vdptool-man-page-to-Makefile.patch
+Patch15: open-lldp-v1.0.1-16-VDP-Fixed-DBG-print-compile-errors-in-32-bit-systems.patch
+Patch16: open-lldp-v1.0.1-17-lldp-automake-fixes-for-dist-distcheck.patch
+Patch17: open-lldp-v1.0.1-18-enabled-test-tool-building-for-distcheck.patch
+Patch18: open-lldp-v1.0.1-19-nltest-build-error.patch
+Patch19: open-lldp-v1.0.1-20-lldp-automake-fix-drop-prefix-on-vdptool_LDADD.patch
+Patch20: open-lldp-v1.0.1-21-lldpad-Fix-DCBX-event-generation-from-lldpad.patch
+Patch21: open-lldp-v1.0.1-22-vdp-Fixed-the-memory-leak-for-modify-VSI-support-for.patch
+Patch22: open-lldp-v1.0.1-23-lldp-make-TTL-TLV-configurable.patch
+Patch23: open-lldp-v1.0.1-24-switch-from-sysv-to-posix-shared-memory-apis.patch
+Patch24: open-lldp-v1.0.1-25-l2_linux_packet-correctly-process-return-value-of-ge.patch
+Patch25: open-lldp-v1.0.1-26-lldpad-system-capability-incorrect-advertised-as-sta.patch
+Patch26: open-lldp-v1.0.1-27-fix-build-warnings.patch
+Patch27: lldpad-0.9.46-Ignore-supplied-PG-configuration-if-PG-is-being-disabled.patch
+Patch28: dont-add-xs-vif-to-lldpad.patch
 
 Requires:           kernel >= 2.6.32
 BuildRequires:      automake autoconf libtool
@@ -56,6 +53,7 @@ BuildRequires:      libconfig-devel >= 1.3.2
 BuildRequires:      libnl3-devel
 BuildRequires:      readline-devel
 BuildRequires:      systemd
+%{?_cov_buildrequires}
 Requires:           readline
 Requires(post):     systemd
 Requires(preun):    systemd
@@ -68,8 +66,6 @@ This package contains the Linux user space daemon and configuration tool for
 Intel LLDP Agent with Enhanced Ethernet support for the Data Center.
 
 %package            devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XS/repos/lldpad.pg/archive?at=v1.0.0&format=tar#/lldpad-v1.0.0.pg.tar) = 08bf87c1437327b8a59eb09234a15469c338ad6c
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/lldpad.centos/archive?at=imports%2Fc7%2Flldpad-1.0.1-3.git036e314.el7&format=tar.gz#/lldpad-1.0.1.centos.tar.gz) = e72aea49f2b7e8092ba55c2495cdc03f7e9b9ece
 Summary:            Development files for %{name}
 Group:              Development/Libraries
 Requires:           %{name}%{?_isa} = %{version}-%{release}
@@ -82,18 +78,20 @@ that use %{name}.
 
 %prep
 %autosetup -p1
+%{?_cov_prepare}
 
 %build
 ./bootstrap.sh
 %configure --disable-static
 # fix the hardened build flags
 sed -i -e 's! \\\$compiler_flags !&\\\$CFLAGS \\\$LDFLAGS !' libtool
-make %{?_smp_mflags}
+%{?_cov_wrap} make %{?_smp_mflags}
 
 %install
 make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 rm -f %{buildroot}%{_libdir}/liblldp_clif.la
+%{?_cov_install}
 
 %post
 /sbin/ldconfig
@@ -140,7 +138,15 @@ fi
 %{_libdir}/pkgconfig/*.pc
 %{_libdir}/liblldp_clif.so
 
+%{?_cov_results_package}
+
 %changelog
+* Mon Feb 14 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-6
+- CP-38416: Enable static analysis
+
+* Fri Dec 04 2020 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-5
+- CP-35517: Build for koji
+
 * Wed Jul 06 2016 Chris Leech <cleech@redhat.com> - 1.0.1-3.git036e314
 - 1273663 sync with upstream v1.0.1-26-g036e314
   system capability incorrect advertised as station only
@@ -256,14 +262,14 @@ fi
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
 * Mon Jun 28 2010 Jan Zeleny <jzeleny@redhat.com> - 0.9.38-1
-- rebased to 0.9.38 (various enhancements and bugfixes, see 
+- rebased to 0.9.38 (various enhancements and bugfixes, see
   lldpad-0.9.38-relnotes.txt on http://e1000.sf.net for complete list)
 
 * Mon May 10 2010 Jan Zeleny <jzeleny@redhat.com> - 0.9.32-2
 - rebuild to match new libconfig
 
 * Mon Apr 12 2010 Jan Zeleny <jzeleny@redhat.com> - 0.9.32-1
-- rebased to 0.9.32 (various enhancements and bugfixes, see 
+- rebased to 0.9.32 (various enhancements and bugfixes, see
   lldpad-0.9.32-relnotes.txt on http://e1000.sf.net for complete list)
 
 * Thu Mar 25 2010 Jan Zeleny <jzeleny@redhat.com> - 0.9.29-2
