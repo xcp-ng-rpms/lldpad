@@ -1,0 +1,34 @@
+From e00392c7b4fa1e1fa447c6e3c930a06263629e98 Mon Sep 17 00:00:00 2001
+From: Aaron Conole <aconole@redhat.com>
+Date: Wed, 31 Jul 2019 16:07:03 -0400
+Subject: [PATCH] ecp: allow for failure to create
+
+Sometimes when trying to create an ecp instance for an interface, the
+interface information becomes invalid, or isn't available in a consumable
+form.  This results in a null pointer being returned but the ecp create
+routine can also return NULL.  The null condition from ecp_create isn't
+checked which leads to SEGV.
+
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ qbg/ecp22.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/qbg/ecp22.c b/qbg/ecp22.c
+index 90b87fe..6561d14 100644
+--- a/qbg/ecp22.c
++++ b/qbg/ecp22.c
+@@ -782,6 +782,10 @@ void ecp22_start(char *ifname)
+ 	ecp = find_ecpdata(ifname, eud);
+ 	if (!ecp)
+ 		ecp = ecp22_create(ifname, eud);
++	if (!ecp) {
++		LLDPAD_DBG("%s:%s failed creating ECP22 instance\n", __func__, ifname);
++		return;
++	}
+ 	ecp->max_retries = ECP22_MAX_RETRIES_DEFAULT;
+ 	ecp->max_rte = ECP22_ACK_TIMER_DEFAULT;
+ 	LIST_INIT(&ecp->inuse.head);
+-- 
+2.21.0
+
