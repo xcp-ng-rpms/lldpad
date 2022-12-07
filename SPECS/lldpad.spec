@@ -1,6 +1,6 @@
-%global package_speccommit 3d91cafde299feddffa167f1ac10e64a49bbadf4
+%global package_speccommit de63ace7ea9cf39f08644f44bd18f73de2ba4978
 %global usver 1.0.1
-%global xsver 6
+%global xsver 7
 %global xsrel %{xsver}%{?xscount}%{?xshash}
 %global package_srccommit refs/tags/v1.0.1
 
@@ -43,7 +43,9 @@ Patch24: open-lldp-v1.0.1-25-l2_linux_packet-correctly-process-return-value-of-g
 Patch25: open-lldp-v1.0.1-26-lldpad-system-capability-incorrect-advertised-as-sta.patch
 Patch26: open-lldp-v1.0.1-27-fix-build-warnings.patch
 Patch27: lldpad-0.9.46-Ignore-supplied-PG-configuration-if-PG-is-being-disabled.patch
-Patch28: dont-add-xs-vif-to-lldpad.patch
+Patch28: 0001-ecp-allow-for-failure-to-create.patch
+Patch29: 0001-ecp22-deinit-l2_packet_data-before-freeing-ecp22.patch
+Patch30: dont-add-xs-vif-to-lldpad.patch
 
 Requires:           kernel >= 2.6.32
 BuildRequires:      automake autoconf libtool
@@ -141,6 +143,9 @@ fi
 %{?_cov_results_package}
 
 %changelog
+* Fri Sep 23 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-7
+- CA-370908: Fix fd leak and resulting segfault
+
 * Mon Feb 14 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-6
 - CP-38416: Enable static analysis
 
