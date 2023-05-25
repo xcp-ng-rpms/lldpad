@@ -1,0 +1,61 @@
+From 185515dac3418faf1ab8028054ef97aaff91a15e Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Thu, 9 Mar 2023 10:29:21 +0000
+Subject: [PATCH] dcbx: Fix use-after-free
+
+Commit f51fa900c8d1 ("dcbx: Fix leak when receiving legacy TLVs with
+mismatched mode") fixed a memory leak but introduced a potential
+use-after-free. The TLV is freed but the return value is TLV_OK which
+causes it to be passed to other modules' rchange handlers.
+
+Instead of freeing it immediately, return SUBTYPE_INVALID which will
+cause the rx loop to free it only after passing it to the other
+handlers.
+
+Found by Coverity.
+
+Fixes: f51fa900c8d1 ("dcbx: Fix leak when receiving legacy TLVs with mismatched mode")
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ lldp_dcbx.c | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/lldp_dcbx.c b/lldp_dcbx.c
+index dad89ad..10adf17 100644
+--- a/lldp_dcbx.c
++++ b/lldp_dcbx.c
+@@ -727,24 +727,21 @@ int dcbx_rchange(struct port *port, struct lldp_agent *agent, struct unpacked_tl
+ 		 * However, capture if any legacy DCBX TLVs are recieved.
+ 		*/
+ 		if (tlv->info[DCB_OUI_LEN] == DCBX_SUBTYPE2) {
+-			if (dcbx->dcbx_st == DCBX_SUBTYPE2)
+-				dcbx->manifest->dcbx2 = tlv;
+-			else
+-				free_unpkd_tlv(tlv);
+ 			agent->lldpdu |= RCVD_LLDP_DCBX2_TLV;
+ 			dcbx->rxed_tlvs = true;
+-			return TLV_OK;
++			if (dcbx->dcbx_st == DCBX_SUBTYPE2) {
++				dcbx->manifest->dcbx2 = tlv;
++				return TLV_OK;
++			}
+ 		} else if (tlv->info[DCB_OUI_LEN] == DCBX_SUBTYPE1) {
+-			if (dcbx->dcbx_st == DCBX_SUBTYPE1)
+-				dcbx->manifest->dcbx1 = tlv;
+-			else
+-				free_unpkd_tlv(tlv);
+ 			agent->lldpdu |= RCVD_LLDP_DCBX1_TLV;
+ 			dcbx->rxed_tlvs = true;
+-			return TLV_OK;
+-		} else {
+-			return SUBTYPE_INVALID;
++			if (dcbx->dcbx_st == DCBX_SUBTYPE1) {
++				dcbx->manifest->dcbx1 = tlv;
++				return TLV_OK;
++			}
+ 		}
++		return SUBTYPE_INVALID;
+ 	}
+ 
+ 	if (tlv->type == TYPE_0) {

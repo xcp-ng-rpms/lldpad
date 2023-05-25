@@ -1,0 +1,31 @@
+From b7e9b0169dae2ca4d1c88ffbb14a748a703cf383 Mon Sep 17 00:00:00 2001
+From: Scott Register <sreg@sreg.io>
+Date: Fri, 15 Jun 2018 12:40:48 -0700
+Subject: [PATCH] ecp22: deinit l2_packet_data before freeing ecp22
+
+When a link is shut, an ecp22 structure is removed for the
+interface. Ecp contains an l2_packet_data which opens a socket
+that needs to be closed via l2_packet_deinit before the ecp22
+structure can be freed.
+
+Failure to close the socket causes a segfault once lldpad has
+exceeded the max open file descriptors.
+---
+ qbg/ecp22.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/qbg/ecp22.c b/qbg/ecp22.c
+index 4640701..ddf7777 100644
+--- a/qbg/ecp22.c
++++ b/qbg/ecp22.c
+@@ -816,6 +816,7 @@ static void ecp22_remove(struct ecp22 *ecp)
+ 	ecp22_removelist(&ecp->isfree.head);
+ 	ecp->isfree.freecnt = 0;
+ 	LIST_REMOVE(ecp, node);
++	l2_packet_deinit(ecp->l2);
+ 	free(ecp);
+ }
+ 
+-- 
+2.31.1
+
