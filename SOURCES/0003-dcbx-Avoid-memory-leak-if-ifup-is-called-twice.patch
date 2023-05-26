@@ -1,0 +1,29 @@
+From 287405a0d9aac2ff36fc341ee2828b761638f514 Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 10 Jan 2023 17:38:52 +0000
+Subject: [PATCH 3/3] dcbx: Avoid memory leak if ifup is called twice
+
+The lldp_mod_ifup() callback may be called multiple times so free stored
+TLVs before building them to avoid leaking memory.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ lldp_dcbx.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lldp_dcbx.c b/lldp_dcbx.c
+index 66df857..f8b898e 100644
+--- a/lldp_dcbx.c
++++ b/lldp_dcbx.c
+@@ -588,6 +588,7 @@ initialized:
+ 	if (exists != cmd_success)
+ 		dont_advertise_dcbx_all(ifname, 1);
+ 
++	dcbx_free_tlv(tlvs);
+ 	dcbx_bld_tlv(port, agent);
+ 
+ 	/* if the dcbx field is not filled in by the capabilities
+-- 
+2.31.1
+

@@ -1,0 +1,40 @@
+From 402f5d0e4b0dbe028b7c5e40215b4a7bb8f4e117 Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 10 Jan 2023 17:27:40 +0000
+Subject: [PATCH 1/1] lldp: Avoid sending uninitialized data
+
+Clear the rest of the frame when rounding up to the minimum ethernet
+frame length to avoid sending uninitialized data.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+diff --git a/lldp/tx.c b/lldp/tx.c
+index c3a5c62..909352e 100644
+--- a/lldp/tx.c
++++ b/lldp/tx.c
+@@ -96,9 +96,10 @@ bool mibConstrInfoLLDPDU(struct port *port, struct lldp_agent *agent)
+ 	fb_offset += ptlv->size;
+ 	ptlv =  free_pkd_tlv(ptlv);
+ 
+-	if (datasize < ETH_MIN_DATA_LEN)
++	if (datasize < ETH_MIN_DATA_LEN) {
++		memset(agent->tx.frameout + fb_offset, 0, ETH_ZLEN - fb_offset);
+ 		agent->tx.sizeout = ETH_ZLEN;
+-	else
++	} else
+ 		agent->tx.sizeout = fb_offset;
+ 
+ 	return true;
+@@ -232,9 +233,10 @@ bool mibConstrShutdownLLDPDU(struct port *port, struct lldp_agent *agent)
+ 	fb_offset += ptlv->size;
+ 	ptlv = free_pkd_tlv(ptlv);
+ 
+-	if (datasize < ETH_MIN_DATA_LEN)
++	if (datasize < ETH_MIN_DATA_LEN) {
++		memset(agent->tx.frameout + fb_offset, 0, ETH_ZLEN - fb_offset);
+ 		agent->tx.sizeout = ETH_ZLEN;
+-	else
++        } else
+ 		agent->tx.sizeout = fb_offset;
+ 	return true;
+ 
