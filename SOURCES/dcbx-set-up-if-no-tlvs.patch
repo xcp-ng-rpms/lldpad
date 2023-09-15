@@ -1,0 +1,28 @@
+dcbx: Don't leave interface in a dormant state
+
+In some circumstances, tlvs may be NULL (e.g. the hardware doesn't support DCBX
+negotiation by a host agent, see the DCB_CAP_DCBX_HOST check in dcbx_ifup()).
+When the dormant delay expires, the interface is left in a dormant state. Fix
+by handling this case and setting the interface to operational up when the
+dormant delay expires.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+diff --git a/lldp_dcbx.c b/lldp_dcbx.c
+index 10adf17..8524598 100644
+--- a/lldp_dcbx.c
++++ b/lldp_dcbx.c
+@@ -88,7 +88,13 @@ static int dcbx_check_operstate(struct port *port, struct lldp_agent *agent)
+ 		return 0;
+ 
+ 	tlvs = dcbx_data(port->ifname);
+-	if (!tlvs || tlvs->operup)
++	if (!tlvs) {
++		if (port->dormantDelay == 1)
++			set_operstate(port->ifname, IF_OPER_UP);
++		return 0;
++	}
++
++	if (tlvs->operup)
+ 		return 0;
+ 
+ 	err = get_app(port->ifname, 0, &app_data);

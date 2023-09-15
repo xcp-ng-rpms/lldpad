@@ -1,6 +1,6 @@
-%global package_speccommit de63ace7ea9cf39f08644f44bd18f73de2ba4978
+%global package_speccommit 1f65f017197978c4d2b3ab1c9c3d74e2c2621e42
 %global usver 1.0.1
-%global xsver 7
+%global xsver 10
 %global xsrel %{xsver}%{?xscount}%{?xshash}
 %global package_srccommit refs/tags/v1.0.1
 
@@ -44,8 +44,22 @@ Patch25: open-lldp-v1.0.1-26-lldpad-system-capability-incorrect-advertised-as-st
 Patch26: open-lldp-v1.0.1-27-fix-build-warnings.patch
 Patch27: lldpad-0.9.46-Ignore-supplied-PG-configuration-if-PG-is-being-disabled.patch
 Patch28: 0001-ecp-allow-for-failure-to-create.patch
-Patch29: 0001-ecp22-deinit-l2_packet_data-before-freeing-ecp22.patch
-Patch30: dont-add-xs-vif-to-lldpad.patch
+Patch29: open-lldp-v1.0.1-28-fix-oid-display.patch
+Patch30: 0001-memleak-on-received-TLVs-from-modules.patch
+Patch31: 0001-lldp_util-allow-for-null-ifa_addr-element.patch
+Patch32: 0001-l2_packet-Guard-ETH_P_LLDP-define.patch
+Patch33: 0001-ecp22-deinit-l2_packet_data-before-freeing-ecp22.patch
+Patch34: 0001-lldp-Avoid-sending-uninitialized-data.patch
+Patch35: 0002-ctrl_iface-Fix-a-memory-leak-in-ctrl_iface_deinit.patch
+Patch36: 0003-dcbx-Avoid-memory-leak-if-ifup-is-called-twice.patch
+Patch37: 0004-dcbx-Free-manifest-in-rchange-callback.patch
+Patch38: 0005-lldp-Reject-frames-with-duplicate-TLVs.patch
+Patch39: 0006-dcbx-Fix-leak-when-receiving-legacy-TLVs-with-mismat.patch
+Patch40: 0001-dcbx-Fix-NULL-pointer-dereference.patch
+Patch41: 0001-dcbx-Fix-use-after-free.patch
+Patch42: dont-add-xs-vif-to-lldpad.patch
+Patch43: dcbx-fix-setting-linkmode.patch
+Patch44: dcbx-set-up-if-no-tlvs.patch
 
 Requires:           kernel >= 2.6.32
 BuildRequires:      automake autoconf libtool
@@ -143,6 +157,15 @@ fi
 %{?_cov_results_package}
 
 %changelog
+* Thu Apr 13 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-10
+- CA-376236: Fix some devices intermittently left dormant
+
+* Tue Mar 14 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-9
+- CA-375626: Fix issues with the fix for CA-374192
+
+* Wed Mar 01 2023 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-8
+- CA-373664/CA-374192: Backport patches to fix leaks and other issues
+
 * Fri Sep 23 2022 Ross Lagerwall <ross.lagerwall@citrix.com> - 1.0.1-7
 - CA-370908: Fix fd leak and resulting segfault
 

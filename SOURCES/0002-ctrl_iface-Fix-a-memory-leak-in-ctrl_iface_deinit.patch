@@ -1,0 +1,26 @@
+From 1990cdd46a15442b0a691a289f1f409f57f5e01e Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 10 Jan 2023 17:31:52 +0000
+Subject: [PATCH 2/2] ctrl_iface: Fix a memory leak in ctrl_iface_deinit
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ ctrl_iface.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ctrl_iface.c b/ctrl_iface.c
+index 5f86fd2..4367128 100644
+--- a/ctrl_iface.c
++++ b/ctrl_iface.c
+@@ -514,6 +514,7 @@ void ctrl_iface_deinit(struct clif_data *clifd)
+ 	while (dst) {
+ 		prev = dst;
+ 		dst = dst->next;
++		free(prev->tlv_types);
+ 		free(prev);
+ 	}
+ 
+-- 
+2.31.1
+

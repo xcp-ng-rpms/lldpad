@@ -1,0 +1,40 @@
+From f51fa900c8d1d0cbb7ef60f5c1de6e43cd18317d Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 10 Jan 2023 18:00:36 +0000
+Subject: [PATCH 6/6] dcbx: Fix leak when receiving legacy TLVs with mismatched
+ mode
+
+When receiving a legacy TLV, it is stored only if the mode matches but
+it will return TLV_OK in both cases which means that the rx loop will
+not free it. Explicitly free it in that case.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ lldp_dcbx.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lldp_dcbx.c b/lldp_dcbx.c
+index 890ed39..1c856da 100644
+--- a/lldp_dcbx.c
++++ b/lldp_dcbx.c
+@@ -734,12 +734,16 @@ int dcbx_rchange(struct port *port, struct lldp_agent *agent, struct unpacked_tl
+ 		if (tlv->info[DCB_OUI_LEN] == DCBX_SUBTYPE2) {
+ 			if (dcbx->dcbx_st == DCBX_SUBTYPE2)
+ 				dcbx->manifest->dcbx2 = tlv;
++			else
++				free_unpkd_tlv(tlv);
+ 			agent->lldpdu |= RCVD_LLDP_DCBX2_TLV;
+ 			dcbx->rxed_tlvs = true;
+ 			return TLV_OK;
+ 		} else if (tlv->info[DCB_OUI_LEN] == DCBX_SUBTYPE1) {
+ 			if (dcbx->dcbx_st == DCBX_SUBTYPE1)
+ 				dcbx->manifest->dcbx1 = tlv;
++			else
++				free_unpkd_tlv(tlv);
+ 			agent->lldpdu |= RCVD_LLDP_DCBX1_TLV;
+ 			dcbx->rxed_tlvs = true;
+ 			return TLV_OK;
+-- 
+2.31.1
+

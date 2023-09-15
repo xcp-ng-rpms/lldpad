@@ -1,0 +1,35 @@
+From d0ed3f78b82e2e9a4e39451b7559804f19697533 Mon Sep 17 00:00:00 2001
+From: Aaron Conole <aconole@redhat.com>
+Date: Wed, 31 Jul 2019 16:03:09 -0400
+Subject: [PATCH] lldp_util: allow for null ifa_addr element
+
+The call to getifaddrs assumes that ifa_addr is always a valid pointer, but
+getifaddrs is allowed to return a NULL value in that field.  Check that the
+value is valid before attempting to access.
+
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+---
+ lldp_util.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/lldp_util.c b/lldp_util.c
+index 32df768..c43abbf 100644
+--- a/lldp_util.c
++++ b/lldp_util.c
+@@ -1055,9 +1055,11 @@ int get_saddr6(const char *ifname, struct sockaddr_in6 *saddr)
+ 
+ 	rc = getifaddrs(&ifaddr);
+ 	if (rc == 0) {
++		rc = -1;
+ 		for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+-			if ((ifa->ifa_addr->sa_family == AF_INET6) &&
+-			    (strncmp(ifa->ifa_name, ifname, IFNAMSIZ) == 0)) {
++			if (strncmp(ifa->ifa_name, ifname, IFNAMSIZ))
++				continue;
++			if (ifa->ifa_addr && (ifa->ifa_addr->sa_family == AF_INET6)) {
+ 				memcpy(saddr, ifa->ifa_addr, sizeof(*saddr));
+ 				rc = 0;
+ 				break;
+-- 
+2.21.0
+
