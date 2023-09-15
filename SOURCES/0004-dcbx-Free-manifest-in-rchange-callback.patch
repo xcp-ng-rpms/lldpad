@@ -1,0 +1,23 @@
+From 2e442f9969582e3ae5dd53dda833f1cc961eff4b Mon Sep 17 00:00:00 2001
+From: Ross Lagerwall <ross.lagerwall@citrix.com>
+Date: Tue, 10 Jan 2023 17:44:49 +0000
+Subject: [PATCH 4/4] dcbx: Free manifest in rchange callback
+
+manifest is allocated in the ifup callback. Free it before reallocating
+it in the rchange callback. This same leak may also occur if processing
+of an LLPDU is aborted half way through.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+Signed-off-by: Aaron Conole <aconole@redhat.com>
+diff --git a/lldp_dcbx.c b/lldp_dcbx.c
+index 3173707..ac24c86 100644
+--- a/lldp_dcbx.c
++++ b/lldp_dcbx.c
+@@ -718,6 +718,7 @@ int dcbx_rchange(struct port *port, struct lldp_agent *agent, struct unpacked_tl
+ 	 * present
+ 	 */
+ 	if (tlv->type == TYPE_1) {
++		clear_dcbx_manifest(dcbx);
+ 		manifest = malloc(sizeof(*manifest));
+ 		memset(manifest, 0, sizeof(*manifest));
+ 		dcbx->manifest = manifest;

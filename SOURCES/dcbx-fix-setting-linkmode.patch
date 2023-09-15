@@ -1,0 +1,33 @@
+dcbx: Fix setting linkmode if up
+
+The kernel assumes if both ifindex and ifname are set that the setlink netlink
+call is going to rename the link and this causes it to fail with EBUSY if the
+link is already up. To fix this, just skip passing the ifname.
+
+Signed-off-by: Ross Lagerwall <ross.lagerwall@citrix.com>
+diff --git a/lldp/ports.c b/lldp/ports.c
+index 6384f14..8e21bca 100644
+--- a/lldp/ports.c
++++ b/lldp/ports.c
+@@ -320,7 +320,7 @@ int remove_port(const char *ifname)
+ 	LLDPAD_DBG("In %s: Found port %s\n", __func__, port->ifname);
+ 
+ 	/* Set linkmode to off */
+-	set_linkmode(ifindex, port->ifname, 0);
++	set_linkmode(ifindex, NULL, 0);
+ 
+ 	/* Close down the socket */
+ 	l2_packet_deinit(port->l2);
+diff --git a/lldp_dcbx_nl.c b/lldp_dcbx_nl.c
+index 7a2dad2..70110f0 100644
+--- a/lldp_dcbx_nl.c
++++ b/lldp_dcbx_nl.c
+@@ -645,7 +645,7 @@ int set_hw_state(char *ifname, int dcb_state)
+ 	int err;
+ 	int ifindex = get_ifidx(ifname);
+ 
+-	err = set_linkmode(ifindex, ifname, dcb_state);
++	err = set_linkmode(ifindex, NULL, dcb_state);
+ 
+ 	if (err)
+ 		LLDPAD_DBG("ERROR %s: set_linkmode dcbstate %i\n",
